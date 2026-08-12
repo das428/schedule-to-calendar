@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Banner to Cal — Lehigh schedule → Google Calendar</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="grid-backdrop" aria-hidden="true">
+    <div class="grid-row"><span>M</span><span>T</span><span>W</span><span>Th</span><span>F</span></div>
+  </div>
+
+  <main>
+    <header class="page-head">
+      <p class="eyebrow">Asa Packer Campus, unofficially</p>
+      <h1>Banner&nbsp;→&nbsp;Cal</h1>
+      <p class="sub">Drop your Lehigh Banner schedule PDF in. Get a calendar file back. Nothing leaves your browser.</p>
+    </header>
+
+    <section id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Upload Banner schedule PDF">
+      <input type="file" id="file-input" accept="application/pdf" hidden />
+      <div class="drop-inner">
+        <div class="drop-icon">＋</div>
+        <p class="drop-label">Drop your schedule PDF here</p>
+        <p class="drop-sub">or click to browse — from Banner's "Print" schedule page</p>
+      </div>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <section id="preview" class="preview hidden">
+      <h2>Here's what we found</h2>
+      <table id="preview-table">
+        <thead>
+          <tr><th>Course</th><th>Days</th><th>Time</th><th>Location</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="download-btn" class="download-btn">Download .ics</button>
+      <p class="fine-print">Double-check this against Banner before importing — parsing isn't perfect, especially for unusual course formats.</p>
+    </section>
+
+    <section class="how-to">
+      <h2>How to use it</h2>
+      <ol>
+        <li>In Banner, go to your registration schedule and use the <strong>Print</strong> view — save or export it as a PDF.</li>
+        <li>Drop that PDF above. Everything happens locally in your browser — the file is never uploaded anywhere.</li>
+        <li>Check the preview table, then hit <strong>Download .ics</strong>.</li>
+        <li>In Google Calendar: <strong>Settings → Import & export → Import</strong>, and select the downloaded file. (Works in Apple Calendar and Outlook too.)</li>
+      </ol>
+    </section>
+
+    <footer class="page-foot">
+      <p>Built by a Lehigh student, for Lehigh students. Not affiliated with Banner or the university.</p>
+    </footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="parser.js"></script>
+  <script src="ics.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
