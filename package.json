@@ -1,0 +1,24 @@
+{
+  "name": "bannertocal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/das428/schedule-to-calendar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/das428/schedule-to-calendar/issues"
+  },
+  "homepage": "https://github.com/das428/schedule-to-calendar#readme",
+  "dependencies": {
+    "pdfjs-dist": "^6.2.108"
+  }
+}

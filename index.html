@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Banner to Cal — Lehigh schedule → Google Calendar</title>
+<title>Banner Schedule to Calendar</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,9 +14,11 @@
 
   <main>
     <header class="page-head">
-      <p class="eyebrow">Asa Packer Campus, unofficially</p>
-      <h1>Banner&nbsp;→&nbsp;Cal</h1>
-      <p class="sub">Drop your Lehigh Banner schedule PDF in. Get a calendar file back. Nothing leaves your browser.</p>
+      <!-- 
+      <p class="eyebrow">Asa Packer Campus, unofficially</p> 
+      -->
+      <h1>Banner&nbsp;→&nbsp;Calendar</h1>
+      <p class="sub">Drop in your Lehigh Banner schedule PDF, get a calendar file back, and upload directly to Google Calendar</p>
     </header>
 
     <section id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Upload Banner schedule PDF">
@@ -32,28 +34,30 @@
 
     <section id="preview" class="preview hidden">
       <h2>Here's what we found</h2>
-      <table id="preview-table">
-        <thead>
-          <tr><th>Course</th><th>Days</th><th>Time</th><th>Location</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-scroll">
+        <table id="preview-table">
+          <thead>
+            <tr><th>Section</th><th>CRN</th><th>Days</th><th>Dates</th><th>Time</th><th>Location</th><th>Instructor</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
       <button id="download-btn" class="download-btn">Download .ics</button>
       <p class="fine-print">Double-check this against Banner before importing — parsing isn't perfect, especially for unusual course formats.</p>
     </section>
 
     <section class="how-to">
-      <h2>How to use it</h2>
+      <h2>How to Use</h2>
       <ol>
-        <li>In Banner, go to your registration schedule and use the <strong>Print</strong> view — save or export it as a PDF.</li>
-        <li>Drop that PDF above. Everything happens locally in your browser — the file is never uploaded anywhere.</li>
-        <li>Check the preview table, then hit <strong>Download .ics</strong>.</li>
+        <li>In Banner, go to your <a href="https://reg-prod.ec.lehigh.edu/StudentRegistrationSsb/ssb/registrationHistory/registrationHistory" target="_blank" rel="noopener">registration schedule</a> 
+          and use the <strong>Print</strong> view to save your schedule as a PDF.</li>
+        <li>Drop that PDF above - everything happens locally in your browser.</li>
+        <li>Check the preview table, then <strong>Download</strong> the .ics file</li>
         <li>In Google Calendar: <strong>Settings → Import & export → Import</strong>, and select the downloaded file. (Works in Apple Calendar and Outlook too.)</li>
       </ol>
     </section>
 
     <footer class="page-foot">
-      <p>Built by a Lehigh student, for Lehigh students. Not affiliated with Banner or the university.</p>
     </footer>
   </main>
 

@@ -40,6 +40,7 @@ async function handleFile(file) {
 
   try {
     const text = await extractPdfText(file);
+    console.log(text); // TEMPORARY — remove after debugging
     parsedCourses = parseCourses(text);
 
     if (parsedCourses.length === 0) {
@@ -48,7 +49,10 @@ async function handleFile(file) {
     }
 
     renderPreview(parsedCourses);
-    setStatus(`Found ${parsedCourses.length} course${parsedCourses.length === 1 ? "" : "s"}. Check the preview below.`, "success");
+    // Recitations/labs are linked sections with 0 credit hours — they still
+    // get their own calendar events, but they shouldn't inflate the course count.
+    const courseCount = parsedCourses.filter((c) => parseFloat(c.credits) !== 0).length;
+    setStatus(`Found ${courseCount} course${courseCount === 1 ? "" : "s"}. Check the preview below.`, "success");
   } catch (err) {
     console.error(err);
     setStatus("Something went wrong reading that PDF. Try re-exporting it from Banner.", "error");
@@ -62,28 +66,94 @@ async function extractPdfText(file) {
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const pageText = content.items.map((item) => item.str).join("\n");
-    fullText += pageText + "\n";
+    fullText += groupItemsIntoLines(content.items) + "\n";
   }
   return fullText;
 }
 
+// pdf.js gives back individual text fragments with x/y positions, not
+// whole lines. Group fragments that share a y-coordinate (same visual
+// row) into one line, ordered left-to-right, so regex matching against
+// full lines (like pdfplumber's output) actually works.
+function groupItemsIntoLines(items) {
+  const rows = new Map(); // rounded y -> array of {x, str}
+
+  items.forEach((item) => {
+    const y = Math.round(item.transform[5]); // vertical position
+    const x = item.transform[4]; // horizontal position
+    if (!rows.has(y)) rows.set(y, []);
+    rows.get(y).push({ x, str: item.str });
+  });
+
+  const sortedYs = [...rows.keys()].sort((a, b) => b - a);
+
+  return sortedYs
+    .map((y) =>
+      rows
+        .get(y)
+        .sort((a, b) => a.x - b.x)
+        .map((f) => f.str)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim()
+    )
+    .filter(Boolean)
+    .join("\n");
+}
+
 function renderPreview(courses) {
   previewBody.innerHTML = "";
+
+  // Group sections by subject+number so a course's lecture, its linked
+  // recitation/lab, and its common-hour exam blocks all land in one block.
+  const groups = new Map(); // "SUBJ NUM" -> { subj, num, title, credits, sections: [course, ...] }
   courses.forEach((course) => {
-    course.meetings.forEach((m) => {
-      const row = document.createElement("tr");
-      const dayLabel = m.days ? m.days.join("/") : "—";
-      const timeLabel = m.timeStart ? `${m.timeStart} – ${m.timeEnd}` : "—";
-      row.innerHTML = `
-        <td>${course.subj} ${course.num}-${course.sec}</td>
-        <td>${dayLabel}</td>
-        <td>${timeLabel}</td>
-        <td>${m.location || "TBD"}</td>
-      `;
-      previewBody.appendChild(row);
+    const key = `${course.subj} ${course.num}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        subj: course.subj,
+        num: course.num,
+        title: course.title,
+        credits: course.credits,
+        sections: [],
+      });
+    }
+    const group = groups.get(key);
+    // The credit-bearing section (not the 0-credit linked recitation/lab)
+    // is the one whose title/credits represent the course as a whole.
+    if (parseFloat(course.credits) !== 0) {
+      group.title = course.title;
+      group.credits = course.credits;
+    }
+    group.sections.push(course);
+  });
+
+  groups.forEach((group) => {
+    const headerRow = document.createElement("tr");
+    headerRow.className = "group-header";
+    headerRow.innerHTML = `<th colspan="7">${group.subj} ${group.num} — ${group.title} (${group.credits} cr)</th>`;
+    previewBody.appendChild(headerRow);
+
+    group.sections.forEach((course) => {
+      course.meetings.forEach((m) => {
+        const row = document.createElement("tr");
+        const dayLabel = m.days ? m.days.join("/") : "—";
+        const dateLabel = m.dateStart === m.dateEnd ? m.dateStart : `${m.dateStart} – ${m.dateEnd}`;
+        const timeLabel = m.timeStart ? `${m.timeStart} – ${m.timeEnd}` : "—";
+        row.innerHTML = `
+          <td>${course.subj} ${course.num}-${course.sec}</td>
+          <td>${course.crn}</td>
+          <td>${dayLabel}</td>
+          <td>${dateLabel}</td>
+          <td>${timeLabel}</td>
+          <td>${m.location || "TBD"}</td>
+          <td>${m.instructor || "TBD"}</td>
+        `;
+        previewBody.appendChild(row);
+      });
     });
   });
+
   previewEl.classList.remove("hidden");
 }
 

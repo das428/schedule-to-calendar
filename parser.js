@@ -13,16 +13,24 @@ const DAY_NAMES = Object.keys(DAY_MAP);
 const HEADER_RE = new RegExp(
   "^(.+?)\\s+([A-Z]{2,4})\\s+(\\d{3})\\s+(\\d{3})\\s+" +
   "(\\d+\\.\\d)\\s+(\\d{5})\\s+" +
-  "(\\d{2}/\\d{2}/\\d{4})\\s*-\\s*(\\d{2}/\\d{2}/\\d{4})"
+  "(\\d{2}/\\d{2}/\\d{4})\\s*[-–—]\\s*(\\d{2}/\\d{2}/\\d{4})"
 );
 
-const DATE_RANGE_RE = /^(\d{2}\/\d{2}\/\d{4})\s*-\s*(\d{2}\/\d{2}\/\d{4})$/;
-const TIME_RE = /^(\d{1,2}:\d{2} [AP]M)\s*-\s*(\d{1,2}:\d{2} [AP]M)$/;
+const DATE_RANGE_RE = /^(\d{2}\/\d{2}\/\d{4})\s*[-–—]\s*(\d{2}\/\d{2}\/\d{4})$/;
+const TIME_RE = /^(\d{1,2}\s*:\s*\d{2}\s*[AP]M)\s*[-–—]\s*(\d{1,2}\s*:\s*\d{2}\s*[AP]M)$/;
 const DAYS_LINE_RE = new RegExp(
   "^(" + DAY_NAMES.join("|") + ")(,\\s*(" + DAY_NAMES.join("|") + "))*$"
 );
 const INSTRUCTOR_RE = /^([A-Za-z\-.]+),\s*([A-Za-z\-. ]+)$/;
 const LOCATION_HINT = "Campus,"; // Banner location lines contain "<Campus name> Campus, <bldg>, <room>"
+
+// Rebuilds a time string into a strict "H:MM AM" format regardless of
+// how many/where stray spaces landed around the colon or AM/PM in the
+// original PDF text extraction.
+function normalizeTime(str) {
+  const m = str.match(/(\d{1,2})\s*:\s*(\d{2})\s*([AP]M)/i);
+  return `${m[1]}:${m[2]} ${m[3].toUpperCase()}`;
+}
 
 function parseCourses(fullText) {
   const lines = fullText.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -59,8 +67,8 @@ function parseCourses(fullText) {
     const time = line.match(TIME_RE);
     if (time && current && current.meetings.length) {
       const m = current.meetings.at(-1);
-      m.timeStart = time[1];
-      m.timeEnd = time[2];
+      m.timeStart = normalizeTime(time[1]);
+      m.timeEnd = normalizeTime(time[2]);
       continue;
     }
 
