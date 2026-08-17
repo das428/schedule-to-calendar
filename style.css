@@ -116,6 +116,8 @@ h1 {
   margin-top: 16px;
   font-size: 14px;
   min-height: 20px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 .status.error { color: #a3320b; }
 .status.working { color: var(--accent); }

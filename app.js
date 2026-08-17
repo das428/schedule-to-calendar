@@ -57,7 +57,7 @@ async function handleFile(file) {
     gtag("event", "schedule_parsed", { course_count: courseCount });
   } catch (err) {
     console.error(err);
-    setStatus("Something went wrong reading that PDF. Try re-exporting it from Banner.", "error");
+    setStatus(`DEBUG: ${err.message}\n${err.stack || ""}`, "error"); // TEMPORARY
   }
 }
 
