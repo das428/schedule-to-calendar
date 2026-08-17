@@ -2,6 +2,7 @@
 // structured list of courses, each with one or more meeting blocks
 // (a course can have multiple blocks — e.g. weekly class + a one-off
 // common hour exam date).
+// Builds an array of course objects.
 
 const DAY_MAP = {
   Monday: "MO", Tuesday: "TU", Wednesday: "WE",

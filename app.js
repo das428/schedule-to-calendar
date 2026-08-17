@@ -1,5 +1,6 @@
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+import * as pdfjsLib from "./lib/pdf.min.mjs"
+
+pdfjsLib.GlobalWorkerOptions.workerSrc= "./lib/pdf.worker.min.mjs"
 
 const dropZone = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
@@ -31,7 +32,7 @@ fileInput.addEventListener("change", () => {
 
 async function handleFile(file) {
   if (file.type !== "application/pdf") {
-    setStatus("That doesn't look like a PDF — export your schedule from Banner's Print view first.", "error");
+    setStatus("Error: doesn't look like a PDF.", "error");
     return;
   }
 
@@ -40,11 +41,10 @@ async function handleFile(file) {
 
   try {
     const text = await extractPdfText(file);
-    console.log(text); // TEMPORARY — remove after debugging
     parsedCourses = parseCourses(text);
 
     if (parsedCourses.length === 0) {
-      setStatus("Couldn't find any courses in that PDF. Make sure it's the Banner schedule print-out.", "error");
+      setStatus("Error: couldn't find any courses in that PDF.", "error");
       return;
     }
 
