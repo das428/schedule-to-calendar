@@ -53,6 +53,8 @@ async function handleFile(file) {
     // get their own calendar events, but they shouldn't inflate the course count.
     const courseCount = parsedCourses.filter((c) => parseFloat(c.credits) !== 0).length;
     setStatus(`Found ${courseCount} course${courseCount === 1 ? "" : "s"}. Check the preview below.`, "success");
+    // google analytics tag for user uploading their pdf
+    gtag("event", "schedule_parsed", { course_count: courseCount });
   } catch (err) {
     console.error(err);
     setStatus("Something went wrong reading that PDF. Try re-exporting it from Banner.", "error");
@@ -158,6 +160,8 @@ function renderPreview(courses) {
 }
 
 downloadBtn.addEventListener("click", () => {
+  //google analytics tag for user downloading the .ics file
+  gtag("event", "ics_downloaded", { course_count: parsedCourses.length });
   const icsText = buildIcs(parsedCourses);
   const blob = new Blob([icsText], { type: "text/calendar" });
   const url = URL.createObjectURL(blob);
