@@ -57,7 +57,7 @@ async function handleFile(file) {
     gtag("event", "schedule_parsed", { course_count: courseCount });
   } catch (err) {
     console.error(err);
-    setStatus(`DEBUG: ${err.message}\n${err.stack || ""}`, "error"); // TEMPORARY
+    setStatus("Something went wrong reading that PDF. Try re-exporting it from Banner.", "error");
   }
 }
 
@@ -163,7 +163,10 @@ downloadBtn.addEventListener("click", () => {
   //google analytics tag for user downloading the .ics file
   gtag("event", "ics_downloaded", { course_count: parsedCourses.length });
   const icsText = buildIcs(parsedCourses);
-  const blob = new Blob([icsText], { type: "text/calendar" });
+  // iOS Safari intercepts "text/calendar" downloads and hands them straight
+  // to the Calendar app instead of saving the file — use a generic binary
+  // type so it actually downloads, since the file's contents are unaffected.
+  const blob = new Blob([icsText], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
