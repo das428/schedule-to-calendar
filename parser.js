@@ -25,12 +25,12 @@ const DAYS_LINE_RE = new RegExp(
 const INSTRUCTOR_RE = /^([A-Za-z\-.]+),\s*([A-Za-z\-. ]+)$/;
 const LOCATION_HINT = "Campus,"; // Banner location lines contain "<Campus name> Campus, <bldg>, <room>"
 
-// Rebuilds a time string into a strict "H:MM AM" format regardless of
+// Rebuilds a time string into a strict "H:MMAM" format regardless of
 // how many/where stray spaces landed around the colon or AM/PM in the
 // original PDF text extraction.
 function normalizeTime(str) {
   const m = str.match(/(\d{1,2})\s*:\s*(\d{2})\s*([AP]M)/i);
-  return `${m[1]}:${m[2]} ${m[3].toUpperCase()}`;
+  return `${m[1]}:${m[2]}${m[3].toUpperCase()}`;
 }
 
 function parseCourses(fullText) {

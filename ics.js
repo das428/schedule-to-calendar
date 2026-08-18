@@ -19,9 +19,10 @@ END:STANDARD
 END:VTIMEZONE`;
 
 function to24Hour(timeStr) {
-  // "10:45 AM" -> "1045"
-  const [time, ampm] = timeStr.split(" ");
-  let [h, m] = time.split(":").map(Number);
+  // "10:45AM" -> "1045"
+  const [, h1, m1, ampm] = timeStr.match(/(\d{1,2}):(\d{2})(AM|PM)/);
+  let h = Number(h1);
+  const m = Number(m1);
   if (ampm === "PM" && h !== 12) h += 12;
   if (ampm === "AM" && h === 12) h = 0;
   return String(h).padStart(2, "0") + String(m).padStart(2, "0") + "00";
